@@ -73,13 +73,7 @@ class Manager():
             self, 
             user_id: int, 
             registered_at, 
-            first_name: str, 
-            username: str, 
-            gender_female: bool, 
-            age: int, 
-            weight: int, 
-            height: int, 
-            goal: str
+            first_name: str
     ):
         """
         Insert user's data in DB.
@@ -87,12 +81,6 @@ class Manager():
         :param user_id: User's Telegram ID.
         :param registered_at: Date of registration.
         :param first_name: User's Telegram first name.
-        :param username: Unique Telegram username.
-        :param gender_female: Is the User a woman.
-        :param age: User's full age.
-        :param weight: User's weight in kg.
-        :param height: User's height in cm.
-        :param goal: User's goal.
         """
         conn = self.get_connection_from_pool()
         conn.autocommit = True
@@ -100,11 +88,11 @@ class Manager():
             with conn.cursor() as cursor:
                 cursor.execute(
                     """
-                    INSERT INTO users (user_id, registered_at, first_name, username, gender_female, age, weight, height, goal) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
+                    INSERT INTO users (user_id, registered_at, first_name) VALUES (%s, %s, %s);
                     """, 
-                    (user_id, registered_at, first_name, username, gender_female, age, weight, height, goal,)
+                    (user_id, registered_at, first_name,)
                 )
-                print("[INFO] Успешная запись данных:", user_id, username, gender_female, age, weight, height, goal)
+                print("[INFO] Успешная запись данных:", user_id)
 
         except Exception as _ex:
             print("[ERROR]", _ex)
