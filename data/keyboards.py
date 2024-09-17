@@ -6,3 +6,10 @@ main_menu = ReplyKeyboardMarkup(
         [KeyboardButton(text="Друзья 👥"), KeyboardButton(text="Особые задания 📍")],
     ], resize_keyboard=True
 )
+
+daily_tasks = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="Список заданий 📋"), KeyboardButton(text="Настройки 🛠")],
+        [KeyboardButton(text="Назад ⬅️")]
+    ], resize_keyboard=True
+)
