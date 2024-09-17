@@ -26,7 +26,7 @@ def get_daily_tasks_keyboard(tasks: list):
             minutes = i[3].minute
             if len(str(minutes)) < 2:
                 minutes = f"0{minutes}"
-                
+
             inline_keyboard.append([InlineKeyboardButton(text=f"{i[2]} {i[3].hour}:{minutes}", callback_data=f"daily_task_{i[0]}")])
     inline_keyboard.append([InlineKeyboardButton(text="Новое задание ✏️", callback_data="new_daily_task")])
 
@@ -50,7 +50,7 @@ async def tasks(message: Message):
 @router.callback_query(F.data == "new_daily_task")
 async def new_daily_task1(callback_query: CallbackQuery, state: FSMContext, bot: Bot):
     await state.set_state(new_dtask.name)
-    await bot.send_message(callback_query.from_user.id, "😉 Окей, давайте для начала зададим ей имя:")
+    await bot.edit_message_text("😉 Окей, давайте для начала зададим имя:", callback_query.from_user.id, callback_query.message.message_id)
 
 @router.message(new_dtask.name)
 async def new_daily_task2(message: Message, state: FSMContext, bot: Bot):
