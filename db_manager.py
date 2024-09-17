@@ -322,6 +322,58 @@ class Manager():
             cursor.close()
             self.release_db_connection(conn)
 
+    def upload_new_daily_task(self, user_id: int, name: str, about: str, time: time):
+        """
+        Upload new user friend in DB.
+
+        :param user_id: User Telegram ID.
+        :param name: New daily task name.
+        :param about: New daily task description.
+        :param time: Time of the task.
+        """
+        conn = self.get_connection_from_pool()
+        conn.autocommit = True
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO daily_tasks (user_id, task_name, time, about) VALUES (%s, %s, %s, %s);
+                    """, 
+                    (user_id, name, time, about,)
+                )
+                print("[INFO] Успешная запись данных", user_id, name, time)
+        
+        except Exception as _ex:
+            print("[ERROR]", _ex)
+        finally:
+            cursor.close()
+            self.release_db_connection(conn)
+
+    def get_daily_tasks(self, user_id) -> list:
+        """
+        Return all tasks from DB in `List`.
+
+        :param user_id: User Telegram ID. 
+        :return: 
+        """
+        conn = self.get_connection_from_pool()
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT * FROM daily_tasks WHERE user_id = %s;
+                    """,
+                    (user_id,)
+                )
+                data = cursor.fetchall()
+                return(data)
+        
+        except Exception as _ex:
+            print("[ERROR]", _ex)
+        finally:
+            cursor.close()
+            self.release_db_connection(conn)
+
     def get_all_user_id(self) -> list:
         """
         Return all Telegram ID's from DB in `list`. 

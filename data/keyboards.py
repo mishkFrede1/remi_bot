@@ -9,7 +9,7 @@ main_menu = ReplyKeyboardMarkup(
 
 daily_tasks = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Список заданий 📋"), KeyboardButton(text="Настройки 🛠")],
+        [KeyboardButton(text="Задания 📋"), KeyboardButton(text="Настройки 🛠")],
         [KeyboardButton(text="Назад ⬅️")]
     ], resize_keyboard=True
 )

@@ -5,7 +5,7 @@ from datetime import datetime
 
 from data import texts, keyboards
 from db_manager import Manager
-from data.phrases import command_phrases
+from data.phrases import phrases
 from random import choice
 
 router = Router()
@@ -22,4 +22,4 @@ async def start(message: Message):
 
 @router.message(F.text == "Назад ⬅️")
 async def back_button(message: Message):
-    await message.answer(choice(command_phrases["menu"]), parse_mode="html", reply_markup=keyboards.main_menu)
+    await message.answer(choice(phrases["menu"]), parse_mode="html", reply_markup=keyboards.main_menu)
