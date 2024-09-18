@@ -169,6 +169,30 @@ class Manager():
             cursor.close()
             self.release_db_connection(conn)
 
+    def delete_daily_task(self, task_id: int):
+        """
+        Delete daily task from DB by task_id.
+
+        :param task_id: Task unique ID.
+        """
+        conn = self.get_connection_from_pool()
+        conn.autocommit = True
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    """
+                    DELETE FROM daily_tasks WHERE daily_task_id = %s;
+                    """, 
+                    (task_id,)
+                )
+                print(f"[INFO] Успешное удаление: {task_id}")
+        
+        except Exception as _ex:
+            print("[ERROR]", _ex)
+        finally:
+            cursor.close()
+            self.release_db_connection(conn)
+
     def upload_exercise(self, exercise: list[str], user_id: int):
         """
         Upload new exercise in DB.
@@ -366,6 +390,31 @@ class Manager():
                     (user_id,)
                 )
                 data = cursor.fetchall()
+                return(data)
+        
+        except Exception as _ex:
+            print("[ERROR]", _ex)
+        finally:
+            cursor.close()
+            self.release_db_connection(conn)
+
+    def get_daily_task_by_id(self, task_id) -> tuple:
+        """
+        Return task from DB by task_id.
+
+        :param task_id: Task unique ID. 
+        :return: 
+        """
+        conn = self.get_connection_from_pool()
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT * FROM daily_tasks WHERE daily_task_id = %s;
+                    """,
+                    (task_id,)
+                )
+                data = cursor.fetchone()
                 return(data)
         
         except Exception as _ex:

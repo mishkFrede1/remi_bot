@@ -18,8 +18,12 @@ async def start(message: Message):
         date_strftime = now.strftime("%d.%m.%Y")
         manager.upload_registration_data(message.from_user.id, date_strftime, message.from_user.first_name)
         
-    await message.answer(texts.start_text, reply_markup=keyboards.main_menu, parse_mode="html")
+    await message.answer(texts.start_text, reply_markup=keyboards.main_menu)
 
 @router.message(F.text == "Назад ⬅️")
 async def back_button(message: Message):
-    await message.answer(choice(phrases["menu"]), parse_mode="html", reply_markup=keyboards.main_menu)
+    await message.answer(choice(phrases["menu"]), reply_markup=keyboards.main_menu)
+
+# @router.message(F.text == "Назад ⬅️")
+# async def back_button(message: Message):
+#     await message.answer(choice(phrases["menu"]), reply_markup=keyboards.main_menu)
