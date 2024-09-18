@@ -346,6 +346,31 @@ class Manager():
             cursor.close()
             self.release_db_connection(conn)
 
+    def upload_new_daily_tasks_settings(self, user_id: int, param: str, value: bool):
+        """
+        Upload new settings of daily tasks in DB
+
+        :param user_id: User Telegram ID.
+        :param param: Name of the coloumn with param
+        :param value: Value of the param
+        """
+        conn = self.get_connection_from_pool()
+        conn.autocommit = True
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    f"""
+                    UPDATE users SET {param} = %s WHERE user_id = %s;
+                    """, (value, user_id,)
+                )
+                print("[INFO] Успешная запись данных", param, value, user_id)
+        
+        except Exception as _ex:
+            print("[ERROR]", _ex)
+        finally:
+            cursor.close()
+            self.release_db_connection(conn)
+
     def upload_new_daily_task(self, user_id: int, name: str, about: str, time: time):
         """
         Upload new user friend in DB.

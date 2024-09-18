@@ -38,6 +38,14 @@ def get_daily_tasks_keyboard(tasks: list):
         inline_keyboard=inline_keyboard
     )
 
+def get_settings_keyboard(status1: str, data1: str, status2: str, data2: str):
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text=f"Напоминать за час | {status1}", callback_data=f"settings_remindAnHourBefore_{data1}"), InlineKeyboardButton(text=f"Быть настойчивой | {status2}", callback_data=f"settings_bePersistent_{data2}")]
+        ]
+    )
+    return keyboard
+
 @router.message(F.text == "Ежедневные задания 📑")
 async def daily_tasks_button(message: Message):
     await message.answer(choice(phrases["daily_tasks"]), parse_mode="html", reply_markup=keyboards.daily_tasks)
@@ -154,3 +162,67 @@ async def daily_task_delete_accept(callback_query: CallbackQuery, state: FSMCont
     if len(tasks) > 0:
         await bot.send_message(callback_query.from_user.id, "📑 Список ежедневных заданий:", reply_markup=get_daily_tasks_keyboard(tasks))
     await state.clear() 
+
+@router.message(F.text == "Настройки 🛠")
+async def daily_tasks_settings(message: Message):
+    user = manager.get_user_data(message.from_user.id)
+    status1 = "❌"
+    data1 = "notActive"
+    if user[4]:
+        status1 = "✅"
+        data1 = "active"
+
+    status2 = "❌"
+    data2 = "notActive"
+    if user[5]:
+        status2 = "✅"
+        data2 = "active"
+
+    await message.answer(choice(phrases["daily_tasks_settings"]), parse_mode="html", reply_markup=get_settings_keyboard(status1, data1, status2, data2))
+
+@router.callback_query(F.data.startswith("settings_remindAnHourBefore_"))
+async def daily_task_remindAnHourBefore_setting(callback_query: CallbackQuery, bot: Bot):
+    data = callback_query.data.split("_")[2]
+    value = False
+    if data == "active": 
+        data = "notActive"
+        status = "❌"
+    else: 
+        data = "active"
+        status = "✅"
+        value = True
+
+    user = manager.get_user_data(callback_query.from_user.id)
+    status2 = "❌"
+    data2 = "notActive"
+    if user[5]:
+        status2 = "✅"
+        data2 = "active"
+
+    manager.upload_new_daily_tasks_settings(callback_query.from_user.id, "remind_an_hour_before", value)
+    await bot.edit_message_reply_markup(callback_query.from_user.id, callback_query.message.message_id, reply_markup=get_settings_keyboard(status, data, status2, data2))
+
+@router.callback_query(F.data.startswith("settings_bePersistent_"))
+async def daily_task_bePersistent_setting(callback_query: CallbackQuery, bot: Bot):
+    data = callback_query.data.split("_")[2]
+    value = False
+    if data == "active": 
+        data = "notActive"
+        status = "❌"
+    else: 
+        data = "active"
+        status = "✅"
+        value = True
+
+    user = manager.get_user_data(callback_query.from_user.id)
+    status2 = "❌"
+    data2 = "notActive"
+    if user[4]:
+        status2 = "✅"
+        data2 = "active"
+
+    manager.upload_new_daily_tasks_settings(callback_query.from_user.id, "persistence", value)
+    await bot.edit_message_reply_markup(callback_query.from_user.id, callback_query.message.message_id, reply_markup=get_settings_keyboard(status2, data2, status, data))
+
+
+

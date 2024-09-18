@@ -24,6 +24,6 @@ async def start(message: Message):
 async def back_button(message: Message):
     await message.answer(choice(phrases["menu"]), reply_markup=keyboards.main_menu)
 
-# @router.message(F.text == "Назад ⬅️")
-# async def back_button(message: Message):
-#     await message.answer(choice(phrases["menu"]), reply_markup=keyboards.main_menu)
+@router.message(F.text == "О Remi ℹ️")
+async def about_Remi(message: Message):
+    await message.answer(texts.about_Remi_text)
