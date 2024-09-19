@@ -27,3 +27,7 @@ async def back_button(message: Message):
 @router.message(F.text == "О Remi ℹ️")
 async def about_Remi(message: Message):
     await message.answer(texts.about_Remi_text)
+
+@router.message(F.text == "Р")
+async def hueta1(message: Message):
+    await message.answer(texts.daily_task_notice_text.format(phrase="Привет, привет!", hour=16, minute="05", name="Дуолинго"))

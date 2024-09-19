@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from aiogram.client.bot import DefaultBotProperties
 
 from handlers import base_commands, daily_tasks
+from utils.scheduler import scheduler, start_all_notices_daily_tasks, start_scheduler
 
 async def main():
     load_dotenv()
@@ -15,6 +16,9 @@ async def main():
         base_commands.router,
         daily_tasks.router
     )
+
+    start_scheduler()
+    start_all_notices_daily_tasks(bot)
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)

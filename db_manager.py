@@ -423,6 +423,31 @@ class Manager():
             cursor.close()
             self.release_db_connection(conn)
 
+    def get_daily_tasks_last_id(self, user_id) -> int:
+        """
+        Return last task_id from DB.
+
+        :param user_id: User Telegram ID. 
+        :return: 
+        """
+        conn = self.get_connection_from_pool()
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT MAX(daily_task_id) FROM daily_tasks WHERE user_id = %s;
+                    """,
+                    (user_id,)
+                )
+                data = cursor.fetchone()[0]
+                return(data)
+        
+        except Exception as _ex:
+            print("[ERROR]", _ex)
+        finally:
+            cursor.close()
+            self.release_db_connection(conn)
+
     def get_daily_task_by_id(self, task_id) -> tuple:
         """
         Return task from DB by task_id.
@@ -680,25 +705,25 @@ class Manager():
             cursor.close()
             self.release_db_connection(conn)
 
-    def get_user_notice(self, user_id: int) -> bool:
+    def get_daily_tasks_setting(self, user_id: int, param: str):
         """
-        Return `bool` value of the user's on/off notifications in DB.
+        Upload new settings of daily tasks in DB
 
-        :param user_id: User's Telegram ID.
+        :param user_id: User Telegram ID.
+        :param param: Name of the coloumn with param
 
-        :return: 
+        :return:
         """
         conn = self.get_connection_from_pool()
         try:
             with conn.cursor() as cursor:
                 cursor.execute(
-                    """
-                    SELECT notifications FROM users WHERE user_id = %s;
-                    """, 
-                    (user_id,)
+                    f"""
+                    SELECT {param} FROM users WHERE user_id = %s;
+                    """, (user_id,)
                 )
-                data = cursor.fetchone()
-                return(data[0])
+                data = cursor.fetchone()[0]
+                return(data)
         
         except Exception as _ex:
             print("[ERROR]", _ex)

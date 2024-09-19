@@ -10,6 +10,7 @@ from db_manager import Manager
 from utils.is_number import isNumber
 from data.phrases import phrases
 from random import choice
+from utils.scheduler import start_new_daily_task_notice
 
 router = Router()
 manager = Manager()
@@ -25,14 +26,16 @@ class delete_dtask(StatesGroup):
 
 def get_daily_tasks_keyboard(tasks: list):
     inline_keyboard = []
-    if len(tasks) > 0:
+    ln = len(tasks)
+    if ln > 0:
         for i in tasks:
             minutes = i[3].minute
             if len(str(minutes)) < 2:
                 minutes = f"0{minutes}"
 
             inline_keyboard.append([InlineKeyboardButton(text=f"{i[2]} {i[3].hour}:{minutes}", callback_data=f"daily_task_{i[0]}")])
-    inline_keyboard.append([InlineKeyboardButton(text="Создать задание ✏️", callback_data="new_daily_task")])
+    if ln < 10:
+        inline_keyboard.append([InlineKeyboardButton(text="Создать задание ✏️", callback_data="new_daily_task")])
 
     return InlineKeyboardMarkup(
         inline_keyboard=inline_keyboard
@@ -41,7 +44,8 @@ def get_daily_tasks_keyboard(tasks: list):
 def get_settings_keyboard(status1: str, data1: str, status2: str, data2: str):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text=f"Напоминать за час | {status1}", callback_data=f"settings_remindAnHourBefore_{data1}"), InlineKeyboardButton(text=f"Быть настойчивой | {status2}", callback_data=f"settings_bePersistent_{data2}")]
+            [InlineKeyboardButton(text=f"Напоминать за час | {status1}", callback_data=f"settings_remindAnHourBefore_{data1}")],
+            [InlineKeyboardButton(text=f"Настойчивость | {status2}", callback_data=f"settings_bePersistent_{data2}")]
         ]
     )
     return keyboard
@@ -100,6 +104,17 @@ async def new_daily_task4(message: Message, state: FSMContext, bot: Bot):
                 data = await state.get_data()
                 manager.upload_new_daily_task(message.from_user.id, data["name"], data["about"], data["time"])
 
+                notice_args = [
+                    message.from_user.id,
+                    bot,
+                    data["name"],
+                    hours,
+                    minutes,
+                    data["about"],
+                    False
+                ]
+                start_new_daily_task_notice(notice_args, hours, minutes, manager.get_daily_tasks_last_id(message.from_user.id))
+
                 await bot.send_message(message.from_user.id, "✅ <b>|</b> <b>Новое задание создано!</b> \nТеперь вы можете увидеть его в своём списке ежедневных задач.\n\n😘 Я буду автоматически напоминать о нём каждый день!", parse_mode="html", reply_markup=keyboards.daily_tasks)
                 await state.clear()
             else:
@@ -109,7 +124,7 @@ async def new_daily_task4(message: Message, state: FSMContext, bot: Bot):
 
     except Exception as _ex:
         print("[ERROR]:", _ex)
-        await message.answer("😣 Упс... Кажется произошла ошибка. Возможно вы неправильно ввели описание.")
+        await message.answer("😣 Упс... Кажется произошла ошибка. Возможно вы ввели время в неправильном формате, попробуйте ещё раз!")
         await state.clear()
 
 @router.callback_query(F.data.startswith("daily_task_"))
