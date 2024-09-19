@@ -28,6 +28,10 @@ async def back_button(message: Message):
 async def about_Remi(message: Message):
     await message.answer(texts.about_Remi_text)
 
-@router.message(F.text == "Р")
+@router.message(F.text == "t1")
 async def hueta1(message: Message):
     await message.answer(texts.daily_task_notice_text.format(phrase="Привет, привет!", hour=16, minute="05", name="Дуолинго"))
+
+@router.message(F.text == "t2")
+async def hueta2(message: Message):
+    await message.answer(texts.daily_task_notice_before_hour_text.format(phrase="Привет, привет!", hour=16, minute="05", name="Дуолинго"))

@@ -10,7 +10,7 @@ from db_manager import Manager
 from utils.is_number import isNumber
 from data.phrases import phrases
 from random import choice
-from utils.scheduler import start_new_daily_task_notice
+from utils.scheduler import start_new_daily_task_notice, scheduler_delete_daily_tasks
 
 router = Router()
 manager = Manager()
@@ -169,6 +169,7 @@ async def daily_task_delete_accept(callback_query: CallbackQuery, state: FSMCont
     task_id = int(data["task_id"])
     if callback_query.data == "yes_delete_daily_task":
         manager.delete_daily_task(task_id)
+        scheduler_delete_daily_tasks(task_id)
         await bot.edit_message_text("✅ <b>|</b> <b>Успешное удаление!</b>", callback_query.from_user.id, callback_query.message.message_id)
     else:
         await bot.edit_message_text("❎ <b>|</b> <b>Отмена!!!</b>", callback_query.from_user.id, callback_query.message.message_id)

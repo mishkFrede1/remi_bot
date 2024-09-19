@@ -89,3 +89,15 @@ def start_new_daily_task_notice(notice_args: list, hour: int, minute: int, task_
         scheduler.add_job(send_daily_task_hour_before_reminder, 'cron', day_of_week='mon-sun', hour=hour-1, minute=minute, args=notice_args, id=f"job_id_dailytaskbefore_{task_id}")
     scheduler.add_job(send_daily_task_reminder, 'cron', day_of_week='mon-sun', hour=hour, minute=minute, args=notice_args, id=f"job_id_dailytask_{task_id}")
     print(scheduler.get_jobs())
+
+def scheduler_delete_daily_tasks(task_id):
+    """
+    Stops all scheduled tasks for a specific user (daily tasks).
+
+    :param user_id: User's telegram id .
+    """
+
+    scheduler.remove_job(job_id=f"job_id_dailytask_{task_id}")#dailytaskbefore
+    try:
+        scheduler.remove_job(job_id=f"job_id_dailytaskbefore_{task_id}")
+    except: pass
